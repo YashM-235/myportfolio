@@ -53,6 +53,7 @@ export default function FuturisticView() {
     return () => typed.destroy();
   }, []);
 
+  
   // Active navigation tracking
   useEffect(() => {
     let animationFrame = null;
@@ -63,26 +64,27 @@ export default function FuturisticView() {
       }
 
       animationFrame = requestAnimationFrame(() => {
-        const activationLine = window.innerHeight * 0.3;
-        let currentSection = sections[0].id;
+        const activationLine = 120;
+        let currentSection = "about";
 
-        sections.forEach(({ id }) => {
+        for (const { id } of sections) {
           const element = document.getElementById(id);
 
-          if (
-            element &&
-            element.getBoundingClientRect().top <= activationLine
-          ) {
+          if (!element) continue;
+
+          const rect = element.getBoundingClientRect();
+
+          if (rect.top <= activationLine) {
             currentSection = id;
+          } else {
+            break;
           }
-        });
+        }
 
-        // Highlight resume when reaching page bottom
-        const isAtBottom =
-          window.innerHeight + window.scrollY >=
-          document.documentElement.scrollHeight - 5;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrollPosition = window.scrollY + window.innerHeight;
 
-        if (isAtBottom) {
+        if (scrollPosition >= documentHeight - 8) {
           currentSection = "resume";
         }
 
@@ -187,12 +189,10 @@ export default function FuturisticView() {
 
       {/* Navigation */}
       <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex gap-3 max-w-[95vw] overflow-x-auto whitespace-nowrap bg-gray-950/80 border border-cyan-400/30 px-4 py-3 rounded-full backdrop-blur-xl shadow-lg shadow-cyan-500/10 text-sm md:text-base">
-
         {sections.map(({ id, label }) => (
           <a
             key={id}
             href={`#${id}`}
-            onClick={() => setActiveSection(id)}
             className={`shrink-0 transition-all duration-300 ${
               activeSection === id
                 ? "font-bold text-cyan-400"
@@ -202,7 +202,6 @@ export default function FuturisticView() {
             {label}
           </a>
         ))}
-
       </nav>
 
       {/* Main Content */}
